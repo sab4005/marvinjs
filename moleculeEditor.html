@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+	<title>Marvin JS</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+	<link type="text/css" rel="stylesheet" href="gui/css/editor.min.css" media="screen" />
+	<script src="gui/lib/promise-1.0.0.min.js"></script>
+	<script src="https://drive.google.com/uc?export=view&id=1nS9Qhj3klvtsPipbR87pXN6g-ae3lq0o"></script>
+	
+	<script>
+    var urlParams;
+    (window.onpopstate = function () {
+      var match,
+          pl     = /\+/g,
+          search = /([^&=]+)=?([^&]*)/g,
+          decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+          query  = window.location.search.substring(1);
+
+      urlParams = {};
+      while (match = search.exec(query))
+        urlParams[decode(match[1])] = decode(match[2]);
+    })(); 	
+
+
+    window.addEventListener("message", function(event) {
+      try {
+        var externalCall = JSON.parse(event.data);
+        marvin.onReady(function() {
+          marvin.sketcherInstance[externalCall.method].apply(marvin.sketcherInstance, externalCall.args);
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    }, false);
+
+
+		function sketchOnLoad () {
+				/* alert(" sketch Onload 1"); */
+				marvin.Sketch.license("/marvin4js-license.cxl"); 
+
+			if (marvin.Sketch.isSupported()) {
+				marvin.sketcherInstance = new marvin.Sketch("sketch");
+
+        buttonAttributes = {
+          "name" : "Click to update compound in Appian",
+          "image-url" : "https://drive.google.com/uc?export=view&id=19fZ4MbkCTZbcbp_s93pfrhryXW6tXGA7",
+          "toolbar" : "N"
+        };
+        marvin.sketcherInstance.addButton(buttonAttributes, function() {
+          buttonClicked();
+        });
+
+
+        getCompound();
+
+			} else {
+				alert("Cannot initiate sketcher. Current browser may not support HTML5 canvas or may run in Compatibility Mode.");
+			}
+
+				alert("Click on 'A' button in the toolbar to save changes in GoSRT application");
+			
+		}
+
+
+    function getCompound() {
+      var compoundId = urlParams["id"];
+      var url = "/suite/webapi/getCompoundData/" + compoundId + "/molFileData";
+
+      $.support.cors = true;
+
+      $.ajax({
+        type: 'GET',
+        dataType: 'text',
+        url: url,
+        crossDomain: true,
+        headers: {'Access-Control-Allow-Origin': '*'},
+        xhrFields: {
+          withCredentials: true
+        }
+      })
+      .done(function( data ) {
+
+          marvin.sketcherInstance.importStructure("mol", data).catch(function(error) {
+            /* alert(error); */
+          });
+
+      })
+      .fail(function(xhr, textStatus, errorThrown) {
+        /* alert("Compund import failed. Creating new blank canvas."); */
+      });
+    }
+
+    function buttonClicked() {
+	  var url = "/suite/plugins/servlet/stateless/marvinJS";
+      var mol;
+
+      marvin.sketcherInstance.exportStructure("mol", null).then(function(molFileData) {
+      $.ajax({
+        type: 'GET',
+        dataType: 'text',
+        data: {compoundId: urlParams["id"], molFileData: molFileData},
+        url: url
+      })
+      .done(function( data ) {
+        alert("Compound was updated successfully.");
+         window.close(); 
+      })
+      .fail(function(xhr, textStatus, errorThrown) {
+        alert("There was a problem updating the compound.");
+      });
+
+      }, function(error) {
+        alert("Molecule export failed.");	
+      });
+    }
+
+	</script>
+</head>
+<body class="mjs-body">
+	<noscript>
+		<div>
+			<p>Your web browser must have JavaScript enabled in order for this application to display correctly.</p>
+		</div>
+	</noscript>
+	<div id="sketch"></div>
+</body>
+</html>
