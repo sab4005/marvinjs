@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--PLEASE DO NOT MODIFY THIS FILE AND BE AWARE THAT THE FILE CONTAINS CONFIDENTIAL INFORMATION.--><ChemAxon>
+    <License>
+        <Field Name="Software" Value="Marvin for JavaScript"/>
+        <Field Name="License Term" Value="Annual Renewal"/>
+        <Field Name="Licensee" Value="Sanofi-Aventis R&amp;D"/>
+        <Field Name="Number of Users" Value="50"/>
+        <Field Name="Expiration Date" Value="2021-12-31"/>
+        <Field Name="Support Expiration Date" Value="2021-12-31"/>
+        <Field Name="Comment" Value="null"/>
+        <Restriction Name="Server Use" Value="Allowed"/>
+        <Signature Value="MC0CFBtKmDA4rcc0mzsElKDvGBDhTgy+AhUAkrIE4Ov/aM7BvITHbzdfX0b0nJg="/>
+    </License>
+</ChemAxon>
